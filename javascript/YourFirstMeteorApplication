@@ -192,3 +192,62 @@ This is probably going to be too broad; you can specify an element inside of the
 			// fires whenever the user clicks an el. w/ class 'classname' inside of template-name
 		}
 	});
+
+---
+
+SESSIONS
+
+---
+
+Sessions are used to store small pieces of data that are not saved to the database
+i.e. they are specific to the client's session.
+
+You can create a session in this manner:
+
+	Session.set('sessionName', 'sessionValue');
+
+And retrieve it as such:
+
+	Session.get('sessionName');
+
+--
+Document IDs
+--
+	var documentId = this._id; 
+	// 'this' is context dependent, as in vanilla JS
+--
+
+SESSIONS & TEMPLATES
+
+
+	.html -------
+
+		<template name="template-name">
+			{{#each book-helper-function}}
+				{{isbn}}
+			{{/each}}
+		</template>
+
+	.js ---------
+	
+		BookDatabase = newMongoCollection('book-collection');
+
+		if (Meteor.isClient) {
+
+			Template.template-name.events({
+				'click .player': function(){
+					var bookId = this._id;
+					Session.set('selectedBook', bookId);
+				}
+			});
+
+			Template.template-name.helpers({
+				'selectedBook': function(){
+					var bookId = this._id;
+					var selectedBook = Session.get('selectedBook');
+					if (bookId = selectedBook)
+				}
+			});
+
+		}
+
