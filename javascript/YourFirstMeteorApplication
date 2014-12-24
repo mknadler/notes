@@ -1,0 +1,43 @@
+Your First Meteor Application
+http://meteortips.com/
+
+For back-end, SQL and PHP are common; however, Meteor uses MongoDB.
+This is the only type of database available in Meteor.
+
+SQL -> MongoDB terminology:
+database	->	database
+table		->	collection
+row			-> 	document
+column		->	field
+primary key	->	primary key
+
+Collections are used to store discrete *types* of data; if this were WordPress,
+there'd be a collection for pages, and a collection for comments.
+
+---
+
+Creating a database:
+
+collectionVar = new Mongo.Collection('collectionName');
+
+---
+
+collectionVar.insert({
+	prop1: val1,
+	prop2: val2
+});
+// Adds new document to collection, in JSON format
+
+collectionVar.find();
+// Retrieves all documents from collection (reactive)
+
+collectionVar.find().fetch();
+// Converts retrieved documents to array (non-reactive)
+
+collectionVar.find().count();
+// Returns number of documents in collection
+
+---
+
+In Meteor, there's no pre-defined structure for the database. 
+Instead, the database structure is created on-the-fly.

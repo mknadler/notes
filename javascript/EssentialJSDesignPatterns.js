@@ -483,5 +483,5 @@ var myNamespace = (function () {
 	// priv function will continue to refer to priv implementation, & pattern doesn't apply to public members, only to functions
 	// ditto for public object members which refer to private variables
 
-	 
+// Singleton 
 
