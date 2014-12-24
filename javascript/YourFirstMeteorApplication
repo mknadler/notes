@@ -1,6 +1,12 @@
 Your First Meteor Application
 http://meteortips.com/
 
+---
+
+DATABASE BASICS
+
+---
+
 For back-end, SQL and PHP are common; however, Meteor uses MongoDB.
 This is the only type of database available in Meteor.
 
@@ -41,3 +47,148 @@ collectionVar.find().count();
 
 In Meteor, there's no pre-defined structure for the database. 
 Instead, the database structure is created on-the-fly.
+
+----
+
+TEMPLATES
+
+---
+
+Meteor handles HTML tag inclusion, and JS + CSS file inclusion.
+
+Templates are used to create a connection between our interface and our JS. When we place interface elements inside a template, we can reference those elements using our application logic.
+
+basic format:
+<template name="template-name">
+	template content
+</template>
+
+Templates get manually included inside of our interface.
+
+To include wholesale:
+{{> template-name}}
+
+--- 
+
+Code written in Meteor is executed on client and server by default.
+
+When a collection is created, the code executed on the server creates that collection inside of the MongoDB database. When the code is executed from the client (browser), a local copy of that collection is created on the client's computer. When a user interacts with the database, they are interacting with a local copy of that database.
+
+This is part of why Meteor apps are real-time by default; data is manipulated locally, and then invisibly synced in the background with the actual, server-side database.
+
+One line of code in Meteor can
+1. Run in two different environments (client and server)
+2. Behave differently depending on the environment
+
+We can specify that we want code to run only in the client with:
+
+if(Meteor.isClient){
+	// this code only runs on the client
+}
+
+and only on the server with:
+
+if(Meteor.isServer){
+	// this code runs only on the server
+}
+
+---
+
+Helpers
+
+---
+
+A helper function is a regular JavaScript function that is attached to a template, allowing us to execute code from within our interface. 
+
+--
+
+The deprecated approach:
+
+Template.template-name.new-helper-name = function(){
+	// helper function code
+}
+
+--
+
+The current approach: 
+
+Template.template-name.helpers({
+	'helper-function-name': function(){
+		// helper function code
+	}
+});
+
+
+The helpers keyword allows us to define multiple helper functions in a single block of code.
+
+--
+
+in the HTML template:
+
+<template name="template-name">
+	{{helper-function-name}}
+</template>
+
+--
+
+The template gets plugged into the page; you can feed information to the template from the DB by defining a helper function connected to that template, and then calling that helper function from inside of the template.
+
+	.html -------
+
+		<template name="template-name">
+			{{#each book-helper-function}}
+				{{isbn}}
+			{{/each}}
+		</template>
+
+	.js ---------
+	
+		BookDatabase = newMongoCollection('book-collection');
+
+		if (Meteor.isClient) {
+
+			Template.template-name.helpers({
+				'book-helper-function': function(){
+					return: BookDatabase.find();
+				}
+			});
+
+		}
+
+This helper function will query BookDatabase for all entries, and, for each entry, return the isbn (aka a specific value). 
+
+----
+
+EVENTS
+
+----
+
+So far, we have a list that appears inside of the inerface, but there's no way for users to interact with it. This data is dynamically retrieved from a collection, but the application is essentially static in appearance.
+
+Creating an event looks like creating a helper.
+
+	if (Meteor.isClient) {
+		Template.template-name.events({
+			// events go here
+		});
+	}
+
+	Template.template-name.events({
+		'click': function(){
+			// fires whenever the user clicks anything inside of the 'template-name' template
+		}
+	});
+
+This is probably going to be too broad; you can specify an element inside of the template ala jQuery.
+
+	Template.template-name.events({
+		'click span': function(){
+			// fires whenever the user clicks a span inside of template-name
+		}
+	});
+
+	Template.template-name.events({
+		'click .classname': function(){
+			// fires whenever the user clicks an el. w/ class 'classname' inside of template-name
+		}
+	});
