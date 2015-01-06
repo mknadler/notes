@@ -1,0 +1,24 @@
+// Notes taken from discovermeteor.com
+
+-----
+
+Meteor uses five types of packages:
+
+1. The Meteor core consists of different Meteor platform packages. These are included when you run 'meteor create'.
+2. Regular Meteor packages are called 'isopacks', which is short for 'isomorphic packages'. This term means they work on both the client and the server. First-party isopacks include accounts-ui, appcache, etc., and are maintained by the Meteor core team and also come bundled with Meteor.
+3. Third-party packages are isopacks developed by other users. They can be found on Atmosphere or via the 'meteor search' command.
+4. Local packages are custom packages that you can create and add to the /packages directory.
+5. NPM packages are Node.js packages; they don't work out of the box with Meteor, but can be used by the previous four types of packages.
+
+-----
+
+Meteor loads & uses specific folder naming syntax:
+
+/server directory code only runs on the server
+/client directory code only runs on the client
+Everything else runs on both server and client
+Static assets go into /public
+
+/lib files are loaded before anything else
+main.* files are loaded after anything else
+everything else loads in alphabetical order based on file name
