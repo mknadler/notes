@@ -1,10 +1,13 @@
 // Notes taken from discovermeteor.com
 
------
+
+----------
+
+Ch. 2
 
 Meteor uses five types of packages:
 
-1. The Meteor core consists of different Meteor platform packages. These are included when you run 'meteor create'.
+1. The Meteor core consists of different Meteor platform packages. These are included when you run $meteor create
 2. Regular Meteor packages are called 'isopacks', which is short for 'isomorphic packages'. This term means they work on both the client and the server. First-party isopacks include accounts-ui, appcache, etc., and are maintained by the Meteor core team and also come bundled with Meteor.
 3. Third-party packages are isopacks developed by other users. They can be found on Atmosphere or via the 'meteor search' command.
 4. Local packages are custom packages that you can create and add to the /packages directory.
@@ -22,3 +25,113 @@ Static assets go into /public
 /lib files are loaded before anything else
 main.* files are loaded after anything else
 everything else loads in alphabetical order based on file name
+
+----------
+
+Ch. 2.5 : Deployment
+
+"Modulus is a great option for deploying Node.js apps. It's one of the few PaaS (platform-as-a-service) provider that officially support Meteor, and there are already quite a few people running production Meteor apps on it.
+
+Demeteorizer
+
+Modulus open-sourced a tool called demeteorizer which converts your Meteor app into a standard Node.js app.
+Start by creating an account. To deploy our app on Modulus, we'll then need to install the Modulus command line tool:
+
+$npm install -g modulus
+And then authenticate with:
+
+$modulus login
+We'll now create a Modulus project (note that you can also do this via Modulus' web dashboard):
+
+$modulus project create
+The next step will be creating a MongoDB database for our app. We can create a MongoDB database with Modulus itself, Compose or with any other cloud MongoDB provider.
+
+Once we've created our MongoDB database, we can get the MONGO_URL for our database from Modulus' web UI (go to Dashboard > Databases > Select your database > Administration), then use it to configure our app like so:
+
+$modulus env set MONGO_URL "mongodb://<user>:<pass>@mongo.onmodulus.net:27017/<database_name>"
+It's now time to deploy our app. It's as simple as typing:
+
+$modulus deploy
+We've now successfully deployed our app to Modulus. Refer to the Modulus documentation for more information about accessing logs, custom domain setup, and SSL.""
+
+Also see: Meteor Up
+
+----------
+
+Ch. 3: Templates
+
+Meteor automagically finds and minifies everything anyways, so you might as well organize your code in a way that makes sense.
+
+Spacebars provides 3 things:
+
+1. Inclusions
+	{{> templateName}}
+	This tells Meteor to replace the inclusion with the template of the same name
+
+2. Expressions
+	{{title}}
+	This either calls a property of the current object, or the return value of a template helper as defined in the current template's manager
+
+3. Block helpers
+	{{#if}}..{{/if}}
+	These help control the flow of the template.
+
+Spacebars docs for more info:
+https://github.com/meteor/meteor/blob/devel/packages/spacebars/README.md
+
+----------
+
+Ch. 4: Collections
+
+In Meteor, declaring a collection can be done like this:
+var Posts = new Mongo.Collection('posts');
+
+In Meteor, the var keyword limits the scop of an object to the current file.
+To make the collection available to the whole app, omit the 'var' keyword.
+
+Web apps have three basic ways of storing data; Meteor uses all three.
+
+1. The browser's memory. Things like JS variables; stored in memory, not permanent; local to current browser tab; will disappear when tab is closed.
+2. The browser's storage. Accessible via cookies or Local Storage. Will persist session-to-session; local to current user, available across instances of app, can't be easily shared with other users.
+3. Server-side database. For Meteor, MongoDB is the default.
+
+In Meteor, the database remains the 'canonical' data source that contains the master copy of your data.
+
+Code inside folders that are not client/ or server/ will run in both contexts. So: a collection defined in, e.g., lib/collections/collection.js will be available to both client and server.
+
+On the server, the collection talks to the MongoDB database, and reads/writes any changes. This functions like a standard DB library.
+
+On the client, the collection is a copy of a subset of the real, canonical collection. The client-side is constantly and (mostly) transparently kept up to date with that subset, in real time.
+
+Mongo shell:
+$meteor mongo
+prompt: >
+
+When deployed on *.meteor.com, you can access the Mongo shell with 
+$meteor mongo myApp
+And you can get logs with
+meteor logs myApp
+
+When you declare
+Posts = new Mongo.Collection('posts');
+on the client, you are creating a local, in-browser cache of the real Mongo collection. It contains a subset of the canonical collection, and offers quick access to that subset.
+Also, these documents that are cached are cache in browser memory, allowing for near-instantaneous access.
+
+The Meteor client-side implementation of Mongo is called MiniMongo. It's not a perfect implementation, and some Mongo features may not work in MiniMongo.
+
+In Meteor, find() returns a cursor, which is a reactive data source. When we want to log its contents, we can use fetch() on that cursor to transform it into an array.
+
+Within an application's template logic, Meteor knows how to iterate over cursors without having to explicitly convert them into arrays; this is why you can run {{#each}} based off of
+return Collection.find();
+
+The autopublish package, which is included in Meteor by default, makes each collection shared in entirety with each connected client.
+
+To manually publish and subscribe:
+
+on the server:
+Meteor.publish('posts', function(){
+	return Posts.find();
+});
+
+on the client:
+Meteor.subscribe('posts');
